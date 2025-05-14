@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from market_app.models import Market
+from market_app.models import Market, Seller
 
 def validate_no_x_y( value):
         errors = []
@@ -34,3 +34,28 @@ class MarketSerializer(serializers.Serializer):
         return instance
     
   
+class SellerDetailSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=255)
+    contact_info = serializers.CharField()
+    # markets = MarketSerializer(many=True, read_only=True)
+    markets = serializers.StringRelatedField(many=True)
+
+
+class SellerCreateSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    contact_info = serializers.CharField()
+    markets = serializers.ListField(child=serializers.IntegerField() ,write_only=True)
+
+    def validate_markets(self, value):
+         markets = Market.objects.filter(id__in=value)
+         if len(markets) != len(value):
+              raise serializers.ValidationError({"message": "passt haltb nicht wirklich"})
+         return value
+    
+    def create(self, validated_data):
+         market_ids= validated_data.pop('markets')
+         seller = Seller.objects.create(**validated_data)
+         markets = Market.objects.filter(id__in=market_ids)
+         seller.markets.set(markets)
+         return seller
