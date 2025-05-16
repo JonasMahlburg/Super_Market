@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import MarketSerializer, SellerSerializer, ProductSerializer
+from .serializers import MarketSerializer, SellerSerializer, ProductSerializer, MarketHyperlinkedSerializer, ProductHyperlinkSerializer
 from market_app.models import Market, Seller, Product
 
 
@@ -9,7 +9,7 @@ from market_app.models import Market, Seller, Product
 def market_view(request):
    if request.method == 'GET':
        markets = Market.objects.all()
-       serializer = MarketSerializer(markets, many=True, context={'request': request})
+       serializer = MarketHyperlinkedSerializer(markets, many=True, context={'request': request}, fields = ['id', 'name', 'location'])
        return Response(serializer.data)
    
    if request.method == 'POST':
@@ -25,7 +25,7 @@ def market_view(request):
 def market_single_view(request, pk):
    if request.method == 'GET':
        market = Market.objects.get(pk=pk)
-       serializer = MarketSerializer(market)
+       serializer = MarketSerializer(market, context={'request': request})
        return Response(serializer.data)
    
    if request.method == 'PUT':
@@ -74,7 +74,7 @@ def sellers_single_view(request, pk):
 def product_view(request):
    if request.method == 'GET':
        products = Product.objects.all()
-       serializer = ProductSerializer(products, many=True)
+       serializer = ProductHyperlinkSerializer(products, many=True, context={'request': request}, fields = ['id', 'name', 'price'] )
        return Response(serializer.data)
    
    if request.method == 'POST':
@@ -84,3 +84,25 @@ def product_view(request):
          return Response(serializer.data)
       else:
          return Response(serializer.errors)
+      
+@api_view(['GET', 'DELETE', 'PUT'])
+def product_single_view(request, pk):
+   if request.method == 'GET':
+       product = Product.objects.get(pk=pk)
+       serializer = ProductSerializer(product, context={'request': request})
+       return Response(serializer.data)
+   
+   if request.method == 'PUT':
+       product = Product.objects.get(pk=pk)
+       serializer = ProductSerializer(product, data=request.data, partial=True)
+       if serializer.is_valid():
+         serializer.save()
+         return Response(serializer.data)
+       else:
+         return Response(serializer.errors)
+   
+   if request.method == 'DELETE':
+       product = Product.objects.get(pk=pk)
+       serializer = ProductSerializer(product)
+       product.delete()
+       return Response(serializer.data)
