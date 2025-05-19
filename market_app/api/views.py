@@ -8,20 +8,15 @@ from rest_framework import mixins
 from rest_framework import generics
 
 
-class Marketsview(mixins.ListModelMixin,
-                  mixins.CreateModelMixin,
-                  generics.GenericAPIView):
-    """
-    List all snippets, or create a new snippet.
-    """
+class Marketsview(generics.ListCreateAPIView):
+
     queryset = Market.objects.all()
     serializer_class = MarketSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+class MarketSingleView(generics.RetrieveUpdateDestroyAPIView):
+   
+    queryset = Market.objects.all()
+    serializer_class = MarketSerializer
 
 
 @api_view(['GET', 'POST'])
