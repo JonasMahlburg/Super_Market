@@ -3,6 +3,25 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import MarketSerializer, SellerSerializer, ProductSerializer, MarketHyperlinkedSerializer, ProductHyperlinkSerializer
 from market_app.models import Market, Seller, Product
+from rest_framework.views import APIView
+from rest_framework import mixins
+from rest_framework import generics
+
+
+class Marketsview(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  generics.GenericAPIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    queryset = Market.objects.all()
+    serializer_class = MarketSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
 @api_view(['GET', 'POST'])
@@ -16,9 +35,9 @@ def market_view(request):
       serializer = MarketSerializer(data=request.data)
       if serializer.is_valid():
          serializer.save()
-         return Response(serializer.data)
+         return Response(serializer.data, status=status.HTTP_201_CREATED)
       else:
-         return Response(serializer.errors)
+         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       
 
 @api_view(['GET', 'DELETE', 'PUT'])
@@ -44,6 +63,22 @@ def market_single_view(request, pk):
        return Response(serializer.data)
    
 
+class Sellersview(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  generics.GenericAPIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    queryset = Seller.objects.all()
+    serializer_class = SellerSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
 @api_view(['GET', 'POST'])
 def sellers_view(request):
    if request.method == 'GET':
@@ -68,7 +103,20 @@ def sellers_single_view(request, pk):
        return Response(serializer.data)
 
 
+class Productsview(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  generics.GenericAPIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 @api_view(['GET', 'POST'])
 def product_view(request):
