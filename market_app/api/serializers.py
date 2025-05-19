@@ -2,7 +2,11 @@ from rest_framework import serializers
 from market_app.models import Market, Seller, Product
 
 
-
+class ProductSeializer(serializers.ModelSerializer):
+        class Meta: 
+         model = Product   
+         fields = '__all__'
+    
 
 class MarketSerializer(serializers.ModelSerializer):   
 
