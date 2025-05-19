@@ -67,7 +67,10 @@ class SellerSerializer(serializers.ModelSerializer):
           return obj.markets.count()
     
   
-
+class SellerListSerializer(SellerSerializer, serializers.HyperlinkedModelSerializer):
+         class Meta:
+          model = Seller
+          fields =  ["url", "name", "market_count", "market_ids", "contact_info"]
 
 class ProductSerializer(serializers.ModelSerializer):  
      markets = MarketSerializer(many=True, read_only=True)
