@@ -1,12 +1,14 @@
 
 from django.urls import path, include
 from .views import Marketsview, MarketDetail, MarketSingleView, SellerOfMarketList, market_single_view, \
-                   Sellersview, SellerDetail, sellers_view, sellers_single_view, \
+                   Sellersview, SellerDetail, SellerViewSet, sellers_view, sellers_single_view, \
                    Productsview, ProductDetail, ProductViewSet, product_view, product_single_view
 from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'products', ProductViewSet)
+router.register(r'sellers', SellerViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
